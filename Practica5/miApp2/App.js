@@ -23,7 +23,7 @@ export default function App() {
       <Text>--------------------------------</Text>
       <Perfil/>
 
-      <StatusBar style="auto" />
+      <StatusBar style="auto" /> 
       
     </View>
   );
