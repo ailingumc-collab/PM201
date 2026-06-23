@@ -6,6 +6,8 @@ import TarjetasScreen from './TarjetasScreen';
 import Componente1 from './Componente1';
 import FormularioScreen from './TextInputAlert';
 import Practica10 from './SafeAreaViewScrollView';
+import PressableScreen from './PressableScreen';
+import SwitchScreen from './SwitchScreen';
 
 /* Zona 2: Main – Componentes */
 export default function App() {
@@ -15,20 +17,22 @@ export default function App() {
     switch(screen){
         case 'tarjetas': 
             return <TarjetasScreen/>
-        
         case 'componente1':
             return <Componente1/>
-
-        
-        case 'formulario':
+        case 'textinputalert':
             return (
                 <FormularioScreen
                 onVolver={() => setScreen('menu')}
                 />
-            );
-
-        case 'practica':
+            )
+        case 'safeareaviewscrollview':
             return <Practica10/>
+
+        case 'pressable':
+            return <PressableScreen/>
+            
+        case 'switch':
+            return <SwitchScreen/>
 
         case 'menu':
         default:
@@ -37,8 +41,10 @@ export default function App() {
                     <Text>Menú</Text>
                     <Button title="Tarjetas" onPress={()=>setScreen('tarjetas')}/>
                     <Button title="Componente1" onPress={()=>setScreen('componente1')}/>
-                    <Button title="TextInputAlert" onPress={()=>setScreen('formulario')}/>
-                    <Button title="SafeAreaViewScrollView" onPress={() => setScreen('practica')}/>
+                    <Button title="TextInputAlert" onPress={()=>setScreen('textinputalert')}/>
+                    <Button title="SafeAreaViewScrollView" onPress={() => setScreen('safeareaviewscrollview')}/>
+                    <Button title="Pressable" onPress={() => setScreen('pressable')}/>
+                    <Button title="Switch" onPress={() => setScreen('switch')}/>
                 </View>
             );
     }
