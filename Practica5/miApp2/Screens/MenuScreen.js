@@ -3,7 +3,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, Button} from 'react-native';
 import React, { useState } from 'react';
 import TarjetasScreen from './TarjetasScreen';
-import Componente1 from './Componente1';
+import Componente1 from './TextInputAlert';
+import TextInputAlert from './TextInputAlert';
+
 
 /* Zona 2: Main – Componentes */
 export default function App() {
@@ -19,7 +21,7 @@ export default function App() {
             <View>
                 <Text> Menú de Prácticas </Text>
                 <Button title="practica Tarjetas" onPress={() => setScreen('tarjetas')} />
-                <Button title="practica Componente1" onPress={() => setScreen('componente1')} />
+                <Button title="TextInput & Alert" onPress={() => setScreen('componente1')} />
 
             </View>
      ); // cierre del return

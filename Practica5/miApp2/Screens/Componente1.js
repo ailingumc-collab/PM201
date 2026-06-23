@@ -2,11 +2,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image} from 'react-native';
 
+
 /* Zona 2: Main – Componentes */
 export default function App() {
   return (
     <View>
-        <Text> Aquí va la primera Práctica de Componentes Nativos</Text>
+      <Text>Aqui va la primer Practica de Componentes Nativos</Text>
     </View>
   );
 }
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     flexDirection: 'row',
   },
 });
