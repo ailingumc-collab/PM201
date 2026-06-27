@@ -1,8 +1,9 @@
+/* Zona 1: importaciones de archivos y componentes */
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 
+/* Zona 2: Main – Componentes */
 export default function PressableScreen() {
-
     const [contador, setContador] = useState(0);
 
     return (
@@ -42,6 +43,7 @@ export default function PressableScreen() {
     );
 }
 
+/* Zona 3: Estilos y posicionamientos */
 const styles = StyleSheet.create({
 
     container: {

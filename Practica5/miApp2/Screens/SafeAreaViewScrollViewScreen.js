@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { SafeAreaView, ScrollView, View, Text, Button } from 'react-native';
 
-export default function Practica() {
+export default function SafeAreaViewScrollViewScreen() {
 
     const [tareas, setTareas] = useState([
         'Ir al gimnasio',

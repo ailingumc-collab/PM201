@@ -4,10 +4,11 @@ import { StyleSheet, Text, View, Image, Button} from 'react-native';
 import React, {useState} from 'react';
 import TarjetasScreen from './TarjetasScreen';
 import Componente1 from './Componente1';
-import FormularioScreen from './TextInputAlert';
-import Practica10 from './SafeAreaViewScrollView';
+import SafeAreaViewScrollViewScreen from './SafeAreaViewScrollViewScreen';
 import PressableScreen from './PressableScreen';
 import SwitchScreen from './SwitchScreen';
+import { ComponenteT } from './ComponenteT';
+import ComponenteAlert from './ComponenteAlert';
 
 /* Zona 2: Main – Componentes */
 export default function App() {
@@ -19,43 +20,42 @@ export default function App() {
             return <TarjetasScreen/>
         case 'componente1':
             return <Componente1/>
-        case 'textinputalert':
-            return (
-                <FormularioScreen
-                onVolver={() => setScreen('menu')}
-                />
-            )
         case 'safeareaviewscrollview':
-            return <Practica10/>
-
+            return <SafeAreaViewScrollViewScreen/>
         case 'pressable':
             return <PressableScreen/>
-            
         case 'switch':
             return <SwitchScreen/>
+
+        case 'ComponenteT':
+            return <ComponenteT/>
+
+        case 'ComponenteAlert':
+            return <ComponenteAlert/>
 
         case 'menu':
         default:
             return (
-                <View>
+                <View style={styles.container}>
                     <Text>Menú</Text>
                     <Button title="Tarjetas" onPress={()=>setScreen('tarjetas')}/>
                     <Button title="Componente1" onPress={()=>setScreen('componente1')}/>
-                    <Button title="TextInputAlert" onPress={()=>setScreen('textinputalert')}/>
-                    <Button title="SafeAreaViewScrollView" onPress={() => setScreen('safeareaviewscrollview')}/>
-                    <Button title="Pressable" onPress={() => setScreen('pressable')}/>
-                    <Button title="Switch" onPress={() => setScreen('switch')}/>
+                    <Button title="SafeAreaViewScrollView" onPress={()=>setScreen('safeareaviewscrollview')}/>
+                    <Button title="Pressable" onPress={()=>setScreen('pressable')}/>
+                    <Button title="Switch" onPress={()=>setScreen('switch')}/> 
+                    <Button title="ComponenteT" onPress={()=>setScreen('ComponenteT')}/>
+                    <Button title="ComponenteAlert" onPress={()=>setScreen('ComponenteAlert')}/>
                 </View>
             );
     }
 }
 /* Zona 3: Estilos y posicionamientos */
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-    flexDirection: 'row',
-  },
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    paddingLeft: 20,
+}
 });
