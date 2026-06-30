@@ -9,6 +9,8 @@ import PressableScreen from './PressableScreen';
 import SwitchScreen from './SwitchScreen';
 import { ComponenteT } from './ComponenteT';
 import ComponenteAlert from './ComponenteAlert';
+import FlatLisScreen from './FlatListScreen';
+import SectionListSceen from './SectionListScreen';
 
 /* Zona 2: Main – Componentes */
 export default function App() {
@@ -33,6 +35,11 @@ export default function App() {
         case 'ComponenteAlert':
             return <ComponenteAlert/>
 
+        case 'FlatList':
+            return <FlatLisScreen/>
+        case 'SectionList':
+            return <SectionListSceen/>
+
         case 'menu':
         default:
             return (
@@ -45,6 +52,8 @@ export default function App() {
                     <Button title="Switch" onPress={()=>setScreen('switch')}/> 
                     <Button title="ComponenteT" onPress={()=>setScreen('ComponenteT')}/>
                     <Button title="ComponenteAlert" onPress={()=>setScreen('ComponenteAlert')}/>
+                    <Button title="FlatList" onPress={()=>setScreen('FlatList')}/>
+                    <Button title="SectionList" onPress={()=>setScreen('SectionList')}/>
                 </View>
             );
     }
