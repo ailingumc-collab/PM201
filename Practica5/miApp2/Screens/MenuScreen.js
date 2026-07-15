@@ -15,6 +15,7 @@ import { ImagenFondoScreen } from '../Screens/ImagenFondoScreen';
 import { HomeScreen } from '../Screens/HomeScreen';
 import { SplashScreen } from '../Screens/SplashScreen';
 import ComponentesN from './ComponentesN';
+import ModalBottomSheetScreen from './ModalBottomSheetScreen';
 
 /* Zona 2: Main – Componentes */
 export default function App() {
@@ -62,7 +63,9 @@ export default function App() {
 
         case 'componentesN':
             return <ComponentesN/>
-        
+
+        case 'modalBottomSheet':
+            return <ModalBottomSheetScreen/>
 
         case 'menu':
         default:
@@ -82,6 +85,7 @@ export default function App() {
                     <Button title="Home" onPress={()=>setScreen('home')}/>
                     <Button title="Splash" onPress={() => setScreen('splashScreen')}/>
                     <Button title="ComponentesN" onPress={() => setScreen('componentesN')}/>
+                    <Button title="Modal y Bottom Sheet" onPress={() => setScreen('modalBottomSheet')}/>
                 </View>
             );
     }
