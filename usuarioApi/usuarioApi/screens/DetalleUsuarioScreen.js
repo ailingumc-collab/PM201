@@ -1,118 +1,119 @@
-import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView, Text, Pressable, StyleSheet, Modal, ActivityIndicator, Alert, Platform } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView, View, Text, StyleSheet, Pressable, Modal, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { useLocalSearchParams, router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function DetalleUsuarioScreen() {
-  const { id } = useLocalSearchParams();
-  const router = useRouter();
 
-  const [usuario, setUsuario] = useState(null);
-  const [cargando, setCargando] = useState(true);
+  const { nombre, edad, id } = useLocalSearchParams();
+
   const [modalVisible, setModalVisible] = useState(false);
-  const [eliminando, setEliminando] = useState(false);
 
-  const API_URL = `http://192.168.100.61:5000/v1/usuarios/${id}`;
-
-  const obtenerDetalle = async () => {
-    try {
-      const respuesta = await fetch(API_URL);
-      const datos = await respuesta.json();
-      setUsuario(datos.usuario || datos);
-    } catch (error) {
-      console.log("Error al obtener detalle:", error);
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  useEffect(() => {
-    if (id) obtenerDetalle();
-  }, [id]);
 
   const eliminarUsuario = async () => {
-    try {
-      setEliminando(true);
-      const respuesta = await fetch(API_URL, {
-        method: 'DELETE',
-      });
+    const usuarioId = Number(id);
+    const username = "admin";
+    const password = "1234";
+    const credentials = btoa(`${username}:${password}`);
 
-      if (respuesta.ok) {
-        setModalVisible(false);
-        router.replace('/(tabs)/consulta');
-      } else {
-        Alert.alert("Error", "No se pudo eliminar el usuario");
+    try {
+      const response = await fetch(
+        `http://192.168.100.61:5000/v1/usuarios/${usuarioId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Basic ${credentials}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("No se pudo eliminar el usuario");
       }
+
+      setModalVisible(false);
+      Alert.alert("Usuario eliminado", "El usuario fue eliminado correctamente");
+      router.replace('/consulta');
+
     } catch (error) {
-      console.log("Error al eliminar:", error);
-    } finally {
-      setEliminando(false);
+      console.error("ERROR:", error);
+      Alert.alert("Error", "No se pudo eliminar el usuario");
     }
   };
 
-  if (cargando) {
-    return (
-      <SafeAreaView style={styles.containerCentrado}>
-        <ActivityIndicator size="large" color="#2563EB" />
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.titulo}>Detalles del Usuario</Text>
-
-        <Text style={styles.label}>Nombre</Text>
-        <Text style={styles.valor}>{usuario?.nombre}</Text>
-
-        <Text style={styles.label}>Edad</Text>
-        <Text style={styles.valor}>{usuario?.edad} años</Text>
-
-        <Pressable 
-          style={styles.botonActualizar} 
-          onPress={() => router.push(`/editar/${id}`)}
-        >
-          <Text style={styles.textoBoton}>Actualizar</Text>
-        </Pressable>
-
-        <Pressable 
-          style={styles.botonEliminar} 
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.textoBoton}>Eliminar</Text>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.botonRegresarContainer}>
+          <Ionicons name="arrow-back" size={24} color="#0e213c" />
+          <Text style={styles.botonRegresar}>Regresar</Text>
         </Pressable>
       </View>
 
-      {/* Modal de confirmación de eliminación requerido */}
+      <Text style={styles.titulo}>Detalles del Usuario</Text>
+
+      <View style={styles.card}>
+
+        <Text style={styles.label}>Nombre</Text>
+        <Text style={styles.dato}>{nombre || 'Sin nombre'}</Text>
+
+        <View style={styles.linea} />
+
+        <Text style={styles.label}>Edad</Text>
+        <Text style={styles.dato}>{edad ? `${edad} años` : ''}</Text>
+
+        <View style={styles.linea} />
+
+        <View style={styles.botones}>
+          <Pressable
+            style={styles.actualizar}
+            onPress={() =>
+              router.push({
+                pathname: '/editar',
+                params: { nombre, edad, id },
+              })
+            }
+          >
+            <Text style={styles.textBotonActualizar}>Actualizar</Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.eliminar}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.textBotonEliminar}>Eliminar</Text>
+          </Pressable>
+        </View>
+      </View>
+
+
       <Modal
-        animationType="fade"
+
         transparent={true}
+        animationType="fade"
+        
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalFondo}>
-          <View style={styles.modalContenido}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
             <Text style={styles.modalTitulo}>Confirmar eliminación</Text>
-            <Text style={styles.modalMensaje}>
-              ¿Estás seguro de que deseas eliminar al usuario {usuario?.nombre}?
+            <Text style={styles.modalTexto}>
+              ¿Estás seguro de que deseas eliminar al usuario {nombre}?
             </Text>
 
             <View style={styles.modalBotones}>
-              <Pressable 
-                style={styles.botonCancelarModal} 
+              <Pressable
+                style={styles.cancelar}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={styles.textoCancelar}>Cancelar</Text>
+                <Text style={{ color: '#374151', fontWeight: 'bold' }}>Cancelar</Text>
               </Pressable>
 
-              <Pressable 
-                style={styles.botonEliminarModal} 
-                onPress={eliminarUsuario}
-                disabled={eliminando}
-              >
-                <Text style={styles.textoBoton}>
-                  {eliminando ? "Eliminando..." : "Sí, eliminar"}
-                </Text>
+              <Pressable style={styles.confirmar} onPress={eliminarUsuario}>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Sí, eliminar</Text>
               </Pressable>
             </View>
           </View>
@@ -127,107 +128,125 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F7FA',
     padding: 20,
-    justifyContent: 'center',
-  },
-  containerCentrado: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 25,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
+    marginTop: 20,
   },
   titulo: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 25,
+
     color: '#1F2937',
-  },
-  label: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  valor: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
     marginBottom: 20,
   },
-  botonActualizar: {
-    backgroundColor: '#EAB308', // Amarillo exacto de la muestra del PDF
-    paddingVertical: 14,
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 20,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  label: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginBottom: 5,
+  },
+  dato: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#374151',
+  },
+  linea: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 15,
+  },
+  botones: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  actualizar: {
+    backgroundColor: '#FACC15',
+    width: 150,
+    paddingVertical: 10,
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 12,
   },
-  botonEliminar: {
-    backgroundColor: '#EF4444', // Rojo exacto de la muestra del PDF
-    paddingVertical: 14,
+  eliminar: {
+    backgroundColor: '#DC2626',
+    width: 150,
+    paddingVertical: 10,
     borderRadius: 10,
     alignItems: 'center',
   },
-  textoBoton: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  textBotonActualizar: {
+    color: '#1F2937',
     fontWeight: 'bold',
+    fontSize: 14,
   },
-  modalFondo: {
+  textBotonEliminar: {
+    color: '#FFFFFF',
+    
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+
+  /* MODAL */
+  modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    
   },
-  modalContenido: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
     padding: 20,
-    alignItems: 'center',
+
   },
   modalTitulo: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#DC2626',
+    textAlign: 'center',
     marginBottom: 10,
   },
-  modalMensaje: {
-    fontSize: 15,
-    color: '#4B5563',
+  modalTexto: {
     textAlign: 'center',
     marginBottom: 20,
+    color: '#374151',
   },
   modalBotones: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+
   },
-  botonCancelarModal: {
-    flex: 1,
+  cancelar: {
+    padding: 10,
+    borderRadius: 6,
     backgroundColor: '#E5E7EB',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginRight: 10,
   },
-  botonEliminarModal: {
-    flex: 1,
-    backgroundColor: '#EF4444',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
+  confirmar: {
+    backgroundColor: '#DC2626',
+    padding: 10,
+    borderRadius: 6,
   },
-  textoCancelar: {
-    color: '#374151',
+  header: {
+    marginBottom: 10,
+  },
+  botonRegresarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  botonRegresar: {
+    color: '#273e5e',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

@@ -13,6 +13,10 @@ export default function TabsLayout(){
         <Tabs.Screen name="consulta" options={{ title:"Consulta",  tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" color={color} size={size} />) }} />
 
+        <Tabs.Screen name="detalle" options={{ href: null }} />
+
+        <Tabs.Screen name="editar" options={{ href: null }} />
+
         </Tabs>
     );
 } 

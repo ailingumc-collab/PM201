@@ -1,170 +1,231 @@
-import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView, Text, TextInput, Pressable, StyleSheet, Alert, Platform, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import {SafeAreaView,View,Text,StyleSheet,Pressable,TextInput,Alert,Platform} from 'react-native';
+import React, {useState} from 'react';
+import { useLocalSearchParams, router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function EditarUsuarioScreen() {
-  const { id } = useLocalSearchParams();
-  const router = useRouter();
+export default function EditarUsuarioScreen(){
 
-  const [nombre, setNombre] = useState('');
-  const [edad, setEdad] = useState('');
-  const [cargando, setCargando] = useState(true);
-  const [guardando, setGuardando] = useState(false);
+    const {nombre, edad, id}=useLocalSearchParams();
 
-  const API_URL = `http://192.168.100.61:5000/v1/usuarios/${id}`;
+    const [nuevoNombre, setNuevoNombre]=useState(nombre);
+    const [nuevaEdad, setNuevaEdad]=useState(String(edad));
+    const [cargando, setCargando]=useState(false);
 
-  const mostrarMensaje = (titulo, mensaje) => {
-    if (Platform.OS === 'web') {
-      window.alert(`${titulo}\n\n${mensaje}`);
-    } else {
-      Alert.alert(titulo, mensaje);
-    }
-  };
-
-  // Precargar los datos actuales del usuario
-  useEffect(() => {
-    const obtenerUsuario = async () => {
-      try {
-        const respuesta = await fetch(API_URL);
-        const datos = await respuesta.json();
-        const info = datos.usuario || datos;
-        setNombre(info.nombre);
-        setEdad(info.edad.toString());
-      } catch (error) {
-        console.log("Error al cargar usuario:", error);
-      } finally {
-        setCargando(false);
-      }
+    const mostrarMensaje=(titulo, mensaje)=>{
+        if(Platform.OS === 'web'){
+            window.alert(`${titulo}\n\n${mensaje}`);
+        }else{
+            Alert.alert(titulo, mensaje);
+        }
     };
 
-    if (id) obtenerUsuario();
-  }, [id]);
+    const ActualizarUsuario = async()=>{
 
-  const guardarCambios = async () => {
-    if (nombre.trim() === '' || edad.trim() === '') {
-      mostrarMensaje("Vacíos", "Llena nombre y edad para continuar");
-      return;
-    }
+        if(nuevoNombre.trim() === '' || nuevaEdad.trim() === ''){
+            mostrarMensaje(
+                "Campos vacíos",
+                "Llena nombre y edad para continuar"
+            );
+            return;
+        }
 
-    try {
-      setGuardando(true);
-      const respuesta = await fetch(API_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: nombre, edad: edad }),
-      });
+        const usuarioId = Number(id);
 
-      if (respuesta.ok) {
-        mostrarMensaje("Éxito", "Usuario actualizado correctamente");
-        router.replace('/(tabs)/consulta');
-      } else {
-        mostrarMensaje("Error", "No se pudo actualizar el usuario");
-      }
-    } catch (error) {
-      mostrarMensaje("Error", "Ocurrió un error en la red");
-      console.log(error);
-    } finally {
-      setGuardando(false);
-    }
-  };
+        console.log("ID recibido:", id);
+        console.log("ID convertido:", usuarioId);
 
-  if (cargando) {
-    return (
-      <SafeAreaView style={styles.containerCentrado}>
-        <ActivityIndicator size="large" color="#2563EB" />
-      </SafeAreaView>
+        const username = "admin";
+        const password = "1234";
+
+        const credentials = btoa(`${username}:${password}`);
+
+        try{
+            setCargando(true);
+            const respuesta = await fetch(
+                `http://192.168.100.61:5000/v1/usuarios/${usuarioId}`,
+                {
+                    method:"PUT",
+                    headers:{
+                        "Content-Type":"application/json",
+                        "Authorization":`Basic ${credentials}`
+                    },
+                    body:JSON.stringify({
+
+                        nombre:nuevoNombre,
+                        edad:Number(nuevaEdad)
+                    })
+                }
+            );
+
+            if(!respuesta.ok){
+                const errorTexto = await respuesta.text();
+                console.log("Respuesta API:", errorTexto);
+                throw new Error("No se pudo actualizar el usuario");
+            }
+
+            const datos = await respuesta.json();
+            console.log("Datos actualizados:", datos);
+
+            mostrarMensaje(
+                "Éxito",
+                "Usuario actualizado correctamente"
+            );
+
+            router.replace({
+                pathname:'/detalle',
+                params:{
+                    id:id,
+                    nombre:nuevoNombre,
+                    edad:nuevaEdad
+                }
+            });
+
+
+
+        }catch(error){
+            console.log("ERROR:",error);
+            mostrarMensaje(
+                "Error",
+                "No fue posible actualizar el usuario"
+            );
+
+        }finally{
+               setCargando(false);
+        }
+
+    };
+
+    return(
+
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <Pressable onPress={()=>router.back()} style={styles.botonRegresarContainer}>
+                    <Ionicons name="arrow-back" size={24} color ="#273e5e"/>
+                    <Text style={styles.botonRegresar}>
+                         Regresar 
+                    </Text>
+                </Pressable>
+            </View>
+
+
+            <View>
+                <Text style={styles.titulo}>
+                    Actualizar Usuario
+                </Text>
+                <View style={styles.formulario}>
+                    <Text style={styles.label}>
+                        Nombre
+                    </Text>
+
+                    <TextInput
+                        style={styles.input}
+                        value={nuevoNombre}
+                        onChangeText={setNuevoNombre}
+                    />
+
+
+
+                    <Text style={styles.label}>
+                        Edad
+                    </Text>
+
+
+
+                    <TextInput
+                        style={styles.input}
+                        value={nuevaEdad}
+                        onChangeText={setNuevaEdad}
+                        keyboardType="numeric"
+                    />
+
+
+
+                    <Pressable
+                        style={styles.guardar}
+                        onPress={ActualizarUsuario}
+                        disabled={cargando}
+                    >
+
+
+                        <Text style={styles.textBoton}>
+                            {
+                                cargando 
+                                ? "Actualizando cambios..."
+                                : "Guardar cambios"
+                            }
+                        </Text>
+
+
+                    </Pressable>
+                </View>
+            </View>
+        </SafeAreaView>
     );
-  }
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.titulo}>Actualizar Usuario</Text>
-
-        <Text style={styles.label}>Nombre</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre del usuario"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-
-        <Text style={styles.label}>Edad</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Edad del usuario"
-          keyboardType="numeric"
-          value={edad}
-          onChangeText={setEdad}
-        />
-
-        <Pressable style={styles.boton} onPress={guardarCambios} disabled={guardando}>
-          <Text style={styles.textoBoton}>
-            {guardando ? "Guardando cambios..." : "Guardar cambios"}
-          </Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
-  );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F7FA',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  containerCentrado: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  card: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    padding: 25,
-    borderRadius: 15,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-  },
-  titulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#1F2937',
-  },
-  label: {
-    fontSize: 14,
-    color: '#4B5563',
-    marginBottom: 6,
-    fontWeight: '600',
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 18,
-    backgroundColor: '#F9FAFB',
-    fontSize: 16,
-  },
-  boton: {
-    backgroundColor: '#EAB308',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  textoBoton: {
-    color: '#FFFFFF',
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
+
+
+    container:{
+        flex:1,
+        backgroundColor:'#F5F7FA',
+        padding:20,
+        marginTop:50,
+    },
+
+    titulo:{
+        fontSize:24,
+        fontWeight:'bold',
+        textAlign:'center',
+        color:'#01060f',
+        marginBottom:20,
+    },
+
+    formulario:{
+        backgroundColor:'#FFFFFF',
+        borderRadius:15,
+        padding:20,
+    },
+
+    label:{
+        fontSize:12,
+        color:'#92a0b9',
+        marginBottom:5,
+    },
+
+    input:{
+        borderWidth:1,
+        borderColor:'#E5E7EB',
+        borderRadius:8,
+        padding:10,
+        marginBottom:15,
+    },
+
+    guardar:{
+        backgroundColor:'#FACC15',
+        padding:10,
+        borderRadius:8,
+        alignItems:'center',
+    },
+
+    textBoton:{
+        color:'#374151',
+        fontWeight:'bold',
+    },
+
+    header:{
+        marginBottom:10,
+    },
+
+    botonRegresarContainer:{
+        flexDirection:'row',
+        alignItems:'center',
+        gap:5,
+    },
+
+    botonRegresar:{
+        color:'#273e5e',
+        fontSize:16,
+        fontWeight:'bold',
+    },
 });
