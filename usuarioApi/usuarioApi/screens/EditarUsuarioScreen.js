@@ -42,7 +42,7 @@ export default function EditarUsuarioScreen(){
         try{
             setCargando(true);
             const respuesta = await fetch(
-                `http://192.168.100.61:5000/v1/usuarios/${usuarioId}`,
+                `http://10.16.32.191:5000/v1/usuarios/${usuarioId}`,
                 {
                     method:"PUT",
                     headers:{
