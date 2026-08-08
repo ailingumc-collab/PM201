@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Gestor de Usuarios",
+    "slug": "repa2",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/libros.jpg",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF0F6"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFF0F6"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.cintia123046230.repa2"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5664cb21-563e-4737-a094-b680383c2f13"
+      }
+    }
+  }
+}
